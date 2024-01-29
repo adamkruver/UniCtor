@@ -1,0 +1,16 @@
+{
+  "name": "com.adamkruver.unictor",
+  "version": "1.0.0",
+  "displayName": "UniCtor",
+  "description": "Dependency resolver for Unity",
+  "unity": "2019.1",
+ "keywords": [
+    "Dependency Injection",
+    "DI",
+  ],
+  "author": {
+    "name": "Adam Kruver",
+    "email": "kruver@mail.ru",
+    "url": "https://github.com/adamkruver/"
+  }
+}
