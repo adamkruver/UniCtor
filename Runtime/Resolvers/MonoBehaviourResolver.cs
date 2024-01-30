@@ -24,6 +24,9 @@ namespace UniCtor.Builders
 
         public static MonoBehaviourResolver Create(MonoBehaviour monoBehaviour)
         {
+            if(monoBehaviour == null)
+                return null;
+        
             foreach (MethodInfo methodInfo in monoBehaviour.GetType().GetMethods(BindingFlags))
             {
                 foreach (object attribute in methodInfo.GetCustomAttributes(true))
@@ -38,6 +41,9 @@ namespace UniCtor.Builders
 
         public void Resolve(IServiceProvider serviceProvider)
         {
+            if (serviceProvider == null) 
+                throw new ArgumentNullException(nameof(serviceProvider));
+            
             List<object> parameters = new List<object>();
 
             foreach (ParameterInfo parameterInfo in _methodInfo.GetParameters())

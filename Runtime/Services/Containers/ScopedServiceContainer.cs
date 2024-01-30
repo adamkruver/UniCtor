@@ -24,6 +24,18 @@ namespace UniCtor.Services.Containers
             _constructorReader = constructorReader ?? throw new ArgumentNullException(nameof(constructorReader));
             _parentContainer = parentContainer;
         }
+        
+        public IServiceCollection RegisterAsScoped<TService>() where TService : class
+        {
+            Type type = typeof(TService);
+            
+            if(type.IsClass == false || type.IsAbstract)
+                throw new InvalidOperationException($"Type {type} must be class and not abstract");
+
+            _types[type] = type;
+
+            return _container;
+        }
 
         public IServiceCollection RegisterAsScoped<TService, TImplementation>() where TImplementation : class, TService
         {

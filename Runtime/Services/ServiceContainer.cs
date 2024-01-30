@@ -61,6 +61,9 @@ namespace UniCtor.Services
         public IServiceCollection RegisterAsSingleton<TService>(Func<IServiceProvider, TService> factory) where TService : class => 
             Singleton.RegisterAsSingleton(factory);
 
+        public IServiceCollection RegisterAsScoped<TService>() where TService : class =>
+            Scoped.RegisterAsScoped<TService>();
+
         public IServiceCollection RegisterAsScoped<TService, TImplementation>()
             where TImplementation : class, TService =>
             Scoped.RegisterAsScoped<TService, TImplementation>();
