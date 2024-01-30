@@ -7,12 +7,12 @@ namespace UniCtor.Services.Containers
 	{
 		bool HasTransient(Type serviceType);
 
-		Type GetTransientType<T>();
+		Type GetType<T>();
 
-		Type GetTransientType(Type serviceType);
+		Type GetType(Type serviceType);
 
-		Func<IServiceProvider, object> GetTransientFactory<T>();
+		Func<IServiceProvider, object> GetFactory<T>();
 
-		Func<IServiceProvider, object> GetTransientFactory(Type serviceType);
+		Func<IServiceProvider, object> GetFactory(Type serviceType);
 	}
 }

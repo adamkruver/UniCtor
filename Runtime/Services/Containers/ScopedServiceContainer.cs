@@ -6,9 +6,9 @@ namespace UniCtor.Services.Containers
 {
     internal class ScopedServiceContainer : IScopedServiceContainer
     {
-        private readonly Dictionary<Type, Type> _scopedTypes = new();
-        private readonly Dictionary<Type, object> _scopedObjects = new();
-        private readonly Dictionary<Type, Func<IServiceProvider, object>> _scopedFactories = new();
+        private readonly Dictionary<Type, Type> _types = new();
+        private readonly Dictionary<Type, object> _objects = new();
+        private readonly Dictionary<Type, Func<IServiceProvider, object>> _factories = new();
 
         private readonly IServiceContainer _container;
         private readonly IScopedServiceContainer _parentContainer;
@@ -32,14 +32,14 @@ namespace UniCtor.Services.Containers
                     $"Type {typeof(TImplementation)} must have only interface or class parameter"
                 );
 
-            _scopedTypes[typeof(TService)] = typeof(TImplementation);
+            _types[typeof(TService)] = typeof(TImplementation);
 
             return _container;
         }
 
         public IServiceCollection RegisterAsScoped<TService>(TService implementation) where TService : class
         {
-            _scopedObjects[typeof(TService)] =
+            _objects[typeof(TService)] =
                 implementation ?? throw new ArgumentNullException(nameof(implementation));
 
             return _container;
@@ -48,7 +48,7 @@ namespace UniCtor.Services.Containers
         public IServiceCollection RegisterAsScoped<TService>(Func<IServiceProvider, TService> factory)
             where TService : class
         {
-            _scopedFactories[typeof(TService)] = factory ?? throw new ArgumentNullException(nameof(factory));
+            _factories[typeof(TService)] = factory ?? throw new ArgumentNullException(nameof(factory));
 
             return _container;
         }
@@ -58,54 +58,54 @@ namespace UniCtor.Services.Containers
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
 
-            _scopedObjects[serviceType] =
+            _objects[serviceType] =
                 implementation ?? throw new ArgumentNullException(nameof(implementation));
         }
 
-        public bool HasScopedType(Type serviceType) =>
-            _scopedTypes.ContainsKey(serviceType) ||
-            (_parentContainer?.HasScopedType(serviceType) ?? false);
+        public bool HasType(Type serviceType) =>
+            _types.ContainsKey(serviceType) ||
+            (_parentContainer?.HasType(serviceType) ?? false);
 
-        public bool HasScopedFactory(Type serviceType) =>
-            _scopedFactories.ContainsKey(serviceType) ||
-            (_parentContainer?.HasScopedFactory(serviceType) ?? false);
+        public bool HasFactory(Type serviceType) =>
+            _factories.ContainsKey(serviceType) ||
+            (_parentContainer?.HasFactory(serviceType) ?? false);
 
         public bool HasScoped(Type serviceType) =>
-            _scopedObjects.ContainsKey(serviceType) ||
-            HasScopedType(serviceType) ||
-            HasScopedFactory(serviceType);
+            _objects.ContainsKey(serviceType) ||
+            HasType(serviceType) ||
+            HasFactory(serviceType);
 
-        public Type GetScopedType<T>() =>
-            GetScopedType(typeof(T));
+        public Type GetType<T>() =>
+            GetType(typeof(T));
 
-        public Type GetScopedType(Type serviceType) =>
-            _scopedTypes.ContainsKey(serviceType)
-                ? _scopedTypes[serviceType]
+        public Type GetType(Type serviceType) =>
+            _types.ContainsKey(serviceType)
+                ? _types[serviceType]
                 : null;
 
-        public object GetScoped<T>() =>
-            GetScoped(typeof(T));
+        public object GetImplementation<T>() =>
+            GetImplementation(typeof(T));
 
-        public object GetScoped(Type serviceType) =>
-            _scopedObjects.ContainsKey(serviceType)
-                ? _scopedObjects[serviceType]
+        public object GetImplementation(Type serviceType) =>
+            _objects.ContainsKey(serviceType)
+                ? _objects[serviceType]
                 : null;
 
-        public Type GetScopedTypeFromParent(Type serviceType) =>
-            _parentContainer?.GetScopedType(serviceType);
+        public Type GetTypeFromParent(Type serviceType) =>
+            _parentContainer?.GetType(serviceType);
         
         public Func<IServiceProvider, object> GetScopedFactoryFromParent(Type serviceType) =>
-            _parentContainer?.GetScopedFactory(serviceType);
+            _parentContainer?.GetFactory(serviceType);
         
-        public object GetScopedFromParent(Type serviceType) =>
-            _parentContainer?.GetScoped(serviceType);
+        public object GetImplementationFromParent(Type serviceType) =>
+            _parentContainer?.GetImplementation(serviceType);
 
-        public Func<IServiceProvider, object> GetScopedFactory<T>() =>
-            GetScopedFactory(typeof(T));
+        public Func<IServiceProvider, object> GetFactory<T>() =>
+            GetFactory(typeof(T));
 
-        public Func<IServiceProvider, object> GetScopedFactory(Type serviceType) =>
-            _scopedFactories.ContainsKey(serviceType)
-                ? _scopedFactories[serviceType]
+        public Func<IServiceProvider, object> GetFactory(Type serviceType) =>
+            _factories.ContainsKey(serviceType)
+                ? _factories[serviceType]
                 : null;
     }
 }

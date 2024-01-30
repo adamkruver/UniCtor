@@ -57,7 +57,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            service = _serviceContainer.GetScoped(serviceType);
+            service = _serviceContainer.GetImplementation(serviceType);
 
             return service != null;
         }
@@ -67,7 +67,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            service = _serviceContainer.GetScopedFromParent(serviceType);
+            service = _serviceContainer.GetImplementationFromParent(serviceType);
 
             return service != null;
         }
@@ -79,7 +79,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            Type type = _serviceContainer.GetScopedType(serviceType);
+            Type type = _serviceContainer.GetType(serviceType);
             service = default;
 
             if (type == null)
@@ -97,7 +97,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            Type type = _serviceContainer.GetScopedTypeFromParent(serviceType);
+            Type type = _serviceContainer.GetTypeFromParent(serviceType);
             service = default;
 
             if (type == null)
@@ -114,7 +114,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            Func<IServiceProvider, object> factory = _serviceContainer.GetScopedFactory(serviceType);
+            Func<IServiceProvider, object> factory = _serviceContainer.GetFactory(serviceType);
             service = null;
 
             if (factory == null)

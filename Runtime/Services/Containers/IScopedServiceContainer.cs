@@ -7,26 +7,26 @@ namespace UniCtor.Services.Containers
 	{
 		bool HasScoped(Type serviceType);
 
-		bool HasScopedType(Type serviceType);
+		bool HasType(Type serviceType);
 
-		bool HasScopedFactory(Type serviceType);
+		bool HasFactory(Type serviceType);
 
-		Type GetScopedType<T>();
+		Type GetType<T>();
 
-		Type GetScopedType(Type serviceType);
+		Type GetType(Type serviceType);
 
-		object GetScoped<T>();
+		object GetImplementation<T>();
 
-		object GetScoped(Type serviceType);
+		object GetImplementation(Type serviceType);
 
-		Func<IServiceProvider, object> GetScopedFactory<T>();
+		Func<IServiceProvider, object> GetFactory<T>();
 
-		Func<IServiceProvider, object> GetScopedFactory(Type serviceType);
+		Func<IServiceProvider, object> GetFactory(Type serviceType);
 
 		void RegisterAsScoped(Type serviceType, object implementation);
 
-		object GetScopedFromParent(Type serviceType);
-		Type GetScopedTypeFromParent(Type serviceType);
+		object GetImplementationFromParent(Type serviceType);
+		Type GetTypeFromParent(Type serviceType);
 		Func<IServiceProvider, object> GetScopedFactoryFromParent(Type serviceType);
 	}
 }

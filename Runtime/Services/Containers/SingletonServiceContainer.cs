@@ -7,8 +7,9 @@ namespace UniCtor.Services.Containers
 {
     internal class SingletonServiceContainer : ISingletonServiceContainer
     {
-        private readonly Dictionary<Type, Type> _singletonTypes = new();
-        private readonly Dictionary<Type, object> _singletonObjects = new();
+        private readonly Dictionary<Type, Type> _types = new();
+        private readonly Dictionary<Type, object> _objects = new();
+        private readonly Dictionary<Type, Func<IServiceProvider, object>> _factories = new();
 
         private readonly IServiceContainer _container;
         private readonly ISingletonServiceContainer _parentContainer;
@@ -28,18 +29,30 @@ namespace UniCtor.Services.Containers
             _constructorReader = constructorReader ?? throw new ArgumentNullException(nameof(constructorReader));
         }
 
+        public IServiceCollection RegisterAsSingleton<TService>() where TService : class
+        {
+            Type type = typeof(TService);
+            
+            if(type.IsClass == false || type.IsAbstract)
+                throw new InvalidOperationException($"Type {type} must be class and not abstract");
+
+            _types[type] = type;
+
+            return _container;
+        }
+
         public IServiceCollection RegisterAsSingleton<TService, TImplementation>()
             where TImplementation : class, TService
         {
             Type serviceType = typeof(TService);
-            HasDependingOnSingleton(serviceType);
+            ValidateSingleRegistration(serviceType);
 
             if (_constructorReader.HasNonInterfaceOrClassParameters(typeof(TImplementation)))
                 throw new InvalidOperationException(
                     $"Type {typeof(TImplementation)} must have only interface or class parameter"
                 );
 
-            _singletonTypes[serviceType] = typeof(TImplementation);
+            _types[serviceType] = typeof(TImplementation);
 
             return _container;
         }
@@ -47,11 +60,19 @@ namespace UniCtor.Services.Containers
         public IServiceCollection RegisterAsSingleton<TService>(TService implementation) where TService : class
         {
             Type serviceType = typeof(TService);
-            HasDependingOnSingleton(serviceType);
+            ValidateSingleRegistration(serviceType);
 
-            _singletonObjects[serviceType] =
+            _objects[serviceType] =
                 implementation ?? throw new ArgumentNullException(nameof(implementation));
             
+            return _container;
+        }
+        
+        public IServiceCollection RegisterAsSingleton<TService>(Func<IServiceProvider, TService> factory)
+            where TService : class
+        {
+            _factories[typeof(TService)] = factory ?? throw new ArgumentNullException(nameof(factory));
+
             return _container;
         }
 
@@ -60,36 +81,45 @@ namespace UniCtor.Services.Containers
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
 
-            if (_singletonObjects.ContainsKey(serviceType))
+            if (_objects.ContainsKey(serviceType))
                 throw new InvalidOperationException($"Type {serviceType} already registered as singleton");
 
-            _singletonObjects[serviceType] = implementation ?? throw new ArgumentNullException(nameof(implementation));
+            _objects[serviceType] = implementation ?? throw new ArgumentNullException(nameof(implementation));
         }
 
         public bool HasSingleton(Type serviceType) =>
-            _singletonTypes.ContainsKey(serviceType) ||
-            _singletonObjects.ContainsKey(serviceType) ||
+            _objects.ContainsKey(serviceType) ||
+            _types.ContainsKey(serviceType) ||
+            _factories.ContainsKey(serviceType) ||
             (_parentContainer?.HasSingleton(serviceType) ?? false);
 
-        public Type GetSingletonType<T>() =>
-            GetSingletonType(typeof(T));
+        public Type GetType<T>() =>
+            GetType(typeof(T));
 
-        public Type GetSingletonType(Type serviceType) =>
-            _parentContainer?.GetSingletonType(serviceType)
-            ?? (_singletonTypes.ContainsKey(serviceType)
-                ? _singletonTypes[serviceType]
+        public Type GetType(Type serviceType) =>
+            _parentContainer?.GetType(serviceType)
+            ?? (_types.ContainsKey(serviceType)
+                ? _types[serviceType]
                 : null);
 
-        public object GetSingleton<T>() =>
-            GetSingleton(typeof(T));
+        public object GetImplementation<T>() =>
+            GetImplementation(typeof(T));
 
-        public object GetSingleton(Type serviceType) =>
-            _parentContainer?.GetSingleton(serviceType)
-            ?? (_singletonObjects.ContainsKey(serviceType)
-                ? _singletonObjects[serviceType]
+        public object GetImplementation(Type serviceType) =>
+            _parentContainer?.GetImplementation(serviceType)
+            ?? (_objects.ContainsKey(serviceType)
+                ? _objects[serviceType]
                 : null);
+        
+        public Func<IServiceProvider, object> GetFactory<T>() =>
+            GetFactory(typeof(T));
 
-        private void HasDependingOnSingleton(Type serviceType)
+        public Func<IServiceProvider, object> GetFactory(Type serviceType) =>
+            _factories.ContainsKey(serviceType)
+                ? _factories[serviceType]
+                : null;
+        
+        private void ValidateSingleRegistration(Type serviceType)
         {
             if (HasSingleton(serviceType))
                 throw new InvalidOperationException($"Type {serviceType} already registered as singleton");

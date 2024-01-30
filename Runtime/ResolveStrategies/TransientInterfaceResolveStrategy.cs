@@ -26,7 +26,7 @@ namespace UniCtor.Strategy
 
         private bool TryResolveWithFactory(Type serviceType, ServiceProvider serviceProvider, out object service)
         {
-            Func<IServiceProvider, object> factory = _services.GetTransientFactory(serviceType);
+            Func<IServiceProvider, object> factory = _services.GetFactory(serviceType);
             service = default;
             
             if (factory == null)
@@ -44,7 +44,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            Type type = _services.GetTransientType(serviceType);
+            Type type = _services.GetType(serviceType);
             service = default;
             
             if (type == null)

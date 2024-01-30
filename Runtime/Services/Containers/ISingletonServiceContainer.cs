@@ -7,13 +7,17 @@ namespace UniCtor.Services.Containers
 	{
 		bool HasSingleton(Type type);
 
-		Type GetSingletonType<T>();
+		Type GetType<T>();
 
-		Type GetSingletonType(Type type);
+		Type GetType(Type type);
 
-		object GetSingleton<T>();
+		object GetImplementation<T>();
 
-		object GetSingleton(Type type);
+		object GetImplementation(Type type);
+
+		Func<IServiceProvider, object> GetFactory<T>();
+
+		Func<IServiceProvider, object> GetFactory(Type serviceType);
 
 		void RegisterAsSingleton(Type serviceType, object implementation);
 	}

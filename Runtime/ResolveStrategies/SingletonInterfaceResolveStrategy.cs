@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UniCtor.Services;
 using UniCtor.Services.Containers;
+using IServiceProvider = UniCtor.Services.IServiceProvider;
 
 namespace UniCtor.Strategy
 {
@@ -24,12 +25,36 @@ namespace UniCtor.Strategy
                 return service;
             }
 
+            if (TryResolveWithFactory(serviceType, serviceProvider, out service))
+            {
+                _serviceContainer.RegisterAsSingleton(serviceType, service);
+                
+                return service;
+            }
+
             throw new InvalidOperationException($"Type: {serviceType} is not registered");
+        }
+
+        private bool TryResolveWithFactory(
+            Type serviceType,
+            ServiceProvider serviceProvider,
+            out object service
+        )
+        {
+            Func<IServiceProvider, object> factory = _serviceContainer.GetFactory(serviceType);
+            service = null;
+
+            if (factory == null)
+                return false;
+
+            service = factory.Invoke(serviceProvider);
+
+            return true;
         }
 
         private bool TryGetImplementation(Type serviceType,  out object service)
         {
-            service = _serviceContainer.GetSingleton(serviceType);
+            service = _serviceContainer.GetImplementation(serviceType);
             
             return service != null;
         }
@@ -41,7 +66,7 @@ namespace UniCtor.Strategy
             out object service
         )
         {
-            Type type = _serviceContainer.GetSingletonType(serviceType);
+            Type type = _serviceContainer.GetType(serviceType);
             service = default;
 
             if (type == null)

@@ -6,8 +6,8 @@ namespace UniCtor.Services.Containers
 {
     internal class TransientServiceContainer : ITransientServiceContainer
     {
-        private readonly Dictionary<Type, Type> _transientTypes = new();
-        private readonly Dictionary<Type, Func<IServiceProvider, object>> _transientFactories = new();
+        private readonly Dictionary<Type, Type> _types = new();
+        private readonly Dictionary<Type, Func<IServiceProvider, object>> _factories = new();
 
         private readonly IServiceContainer _container;
         private readonly ITransientServiceContainer _parentContainer;
@@ -32,7 +32,7 @@ namespace UniCtor.Services.Containers
                     $"Type {typeof(TImplementation)} must have only interface or class parameter"
                 );
 
-            _transientTypes[typeof(TService)] = typeof(TImplementation);
+            _types[typeof(TService)] = typeof(TImplementation);
 
             return _container;
         }
@@ -40,32 +40,32 @@ namespace UniCtor.Services.Containers
         public IServiceCollection RegisterAsTransient<TService>(Func<IServiceProvider, TService> factory)
             where TService : class
         {
-            _transientFactories[typeof(TService)] = factory ?? throw new ArgumentNullException(nameof(factory));
+            _factories[typeof(TService)] = factory ?? throw new ArgumentNullException(nameof(factory));
 
             return _container;
         }
 
         public bool HasTransient(Type serviceType) =>
-            _transientTypes.ContainsKey(serviceType) ||
-            _transientFactories.ContainsKey(serviceType) ||
+            _types.ContainsKey(serviceType) ||
+            _factories.ContainsKey(serviceType) ||
             (_parentContainer?.HasTransient(serviceType) ?? false);
 
-        public Type GetTransientType<T>() =>
-            GetTransientType(typeof(T));
+        public Type GetType<T>() =>
+            GetType(typeof(T));
 
-        public Type GetTransientType(Type serviceType) =>
-            (_transientTypes.ContainsKey(serviceType)
-                ? _transientTypes[serviceType]
+        public Type GetType(Type serviceType) =>
+            (_types.ContainsKey(serviceType)
+                ? _types[serviceType]
                 : null)
-            ?? _parentContainer?.GetTransientType(serviceType);
+            ?? _parentContainer?.GetType(serviceType);
 
-        public Func<IServiceProvider, object> GetTransientFactory<T>() =>
-            GetTransientFactory(typeof(T));
+        public Func<IServiceProvider, object> GetFactory<T>() =>
+            GetFactory(typeof(T));
 
-        public Func<IServiceProvider, object> GetTransientFactory(Type serviceType) =>
-            (_transientFactories.ContainsKey(serviceType)
-                ? _transientFactories[serviceType]
+        public Func<IServiceProvider, object> GetFactory(Type serviceType) =>
+            (_factories.ContainsKey(serviceType)
+                ? _factories[serviceType]
                 : null)
-            ?? _parentContainer?.GetTransientFactory(serviceType);
+            ?? _parentContainer?.GetFactory(serviceType);
     }
 }
