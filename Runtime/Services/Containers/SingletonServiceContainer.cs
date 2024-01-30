@@ -115,9 +115,10 @@ namespace UniCtor.Services.Containers
             GetFactory(typeof(T));
 
         public Func<IServiceProvider, object> GetFactory(Type serviceType) =>
-            _factories.ContainsKey(serviceType)
+            _parentContainer?.GetFactory(serviceType) ??
+            (_factories.ContainsKey(serviceType)
                 ? _factories[serviceType]
-                : null;
+                : null);
         
         private void ValidateSingleRegistration(Type serviceType)
         {
