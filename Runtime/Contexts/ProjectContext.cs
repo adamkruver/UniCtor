@@ -1,5 +1,4 @@
-﻿using UniCtor.Builders;
-using UniCtor.Installers;
+﻿using UniCtor.Installers;
 using UniCtor.Resolvers;
 using UnityEngine;
 
@@ -26,7 +25,8 @@ namespace UniCtor.Contexts
         private void InstallConfigs()
         {
             foreach (MonoInstaller monoInstaller in _monoInstallers)
-                monoInstaller.OnConfigure(_dependencyResolver.Services);
+                if (monoInstaller != null)
+                    monoInstaller.OnConfigure(_dependencyResolver.Services);
         }
 
         public void Resolve(GameObject @object) =>

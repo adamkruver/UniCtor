@@ -8,12 +8,12 @@ using UnityEngine;
 namespace UniCtor.Contexts
 {
     [DefaultExecutionOrder(-100000)]
-    public sealed class SceneContext : MonoBehaviour
+    public sealed class SceneContext : MonoBehaviour, ISceneContext
     {
         [SerializeField] private MonoInstaller[] _monoInstallers;
 
         private ProjectContext _projectContext;
-        private IDependencyResolver _dependencyResolver;
+        public IDependencyResolver DependencyResolver { get; private set; }
 
         private void Awake()
         {
@@ -27,7 +27,7 @@ namespace UniCtor.Contexts
             var sceneObjects = FindObjectsOfType<GameObject>().Except(new GameObject[] { gameObject });
 
             foreach (GameObject @object in sceneObjects)
-                _dependencyResolver.Resolve(@object);
+                DependencyResolver.Resolve(@object);
         }
 
         private ProjectContext CreateProjectContext() =>
@@ -36,7 +36,8 @@ namespace UniCtor.Contexts
         [Constructor]
         private void Construct(IDependencyResolver dependencyResolver)
         {
-            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            DependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            DependencyResolver.Services.RegisterAsSingleton<ISceneContext>(this);
 
             InstallConfigs();
             ConstructObjectOnScene();
@@ -57,7 +58,8 @@ namespace UniCtor.Contexts
         private void InstallConfigs()
         {
             foreach (MonoInstaller monoInstaller in _monoInstallers)
-                monoInstaller.OnConfigure(_dependencyResolver.Services);
+                if (monoInstaller != null)
+                    monoInstaller.OnConfigure(DependencyResolver.Services);
         }
     }
 }
