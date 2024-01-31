@@ -34,8 +34,16 @@ namespace UniCtor.Services
         public IResolveStrategy GetResolveStrategy(Type serviceType)
         {
             if (serviceType.IsClass)
+            {
+                if (Singleton.HasSingleton(serviceType))
+                    return new SingletonClassResolveStrategy(_classResolveStrategy, Singleton);
+                
+                if (Scoped.HasScoped(serviceType))
+                    return new ScopedClassResolveStrategy(_classResolveStrategy, Scoped);
+
                 return _classResolveStrategy;
-            
+            }
+
             if (Singleton.HasSingleton(serviceType))
                 return _singletonInterfaceStrategy;
 
@@ -48,7 +56,7 @@ namespace UniCtor.Services
             throw new InvalidOperationException($"Type: {serviceType} is not registered");
         }
 
-        public IServiceCollection RegisterAsSingleton<TService>() where TService : class => 
+        public IServiceCollection RegisterAsSingleton<TService>() where TService : class =>
             Singleton.RegisterAsSingleton<TService>();
 
         public IServiceCollection RegisterAsSingleton<TService, TImplementation>()
@@ -58,7 +66,8 @@ namespace UniCtor.Services
         public IServiceCollection RegisterAsSingleton<TService>(TService implementation) where TService : class =>
             Singleton.RegisterAsSingleton(implementation);
 
-        public IServiceCollection RegisterAsSingleton<TService>(Func<IServiceProvider, TService> factory) where TService : class => 
+        public IServiceCollection RegisterAsSingleton<TService>(Func<IServiceProvider, TService> factory)
+            where TService : class =>
             Singleton.RegisterAsSingleton(factory);
 
         public IServiceCollection RegisterAsScoped<TService>() where TService : class =>
