@@ -7,6 +7,8 @@ namespace UniCtor.Services.Containers
 	{
 		bool HasTransient(Type serviceType);
 
+		bool HasFactory(Type serviceType);
+
 		Type GetType<T>();
 
 		Type GetType(Type serviceType);

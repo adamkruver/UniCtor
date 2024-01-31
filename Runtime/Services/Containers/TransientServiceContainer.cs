@@ -50,6 +50,10 @@ namespace UniCtor.Services.Containers
             _factories.ContainsKey(serviceType) ||
             (_parentContainer?.HasTransient(serviceType) ?? false);
 
+        public bool HasFactory(Type serviceType) =>
+            _factories.ContainsKey(serviceType) ||
+            (_parentContainer?.HasTransient(serviceType) ?? false);
+
         public Type GetType<T>() =>
             GetType(typeof(T));
 

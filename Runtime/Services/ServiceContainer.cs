@@ -41,6 +41,9 @@ namespace UniCtor.Services
                 if (Scoped.HasScoped(serviceType))
                     return new ScopedClassResolveStrategy(_classResolveStrategy, Scoped);
 
+                if (Transient.HasFactory(serviceType))
+                    return new TransientClassResolveStrategy(_transientInterfaceStrategy, Transient);
+
                 return _classResolveStrategy;
             }
 
