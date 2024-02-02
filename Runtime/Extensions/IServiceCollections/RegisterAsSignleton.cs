@@ -61,5 +61,65 @@ namespace Sources.Extensions.IServiceCollections
                 .RegisterAsSingleton<TService3>(provider => provider.GetService<TImplementation>())
                 .RegisterAsSingleton<TService4>(provider => provider.GetService<TImplementation>())
                 .RegisterAsSingleton<TService5>(provider => provider.GetService<TImplementation>());
+
+        public static IServiceCollection RegisterAsSingleton<TService1, TService2, TImplementation>(
+            this IServiceCollection services,
+            TImplementation implementation
+        )
+            where TService1 : class
+            where TService2 : class
+            where TImplementation : class, TService1, TService2 =>
+            services
+                .RegisterAsSingleton(implementation)
+                .RegisterAsSingleton<TService1>(implementation)
+                .RegisterAsSingleton<TService2>(implementation);
+
+        public static IServiceCollection RegisterAsSingleton<TService1, TService2, TService3, TImplementation>(
+            this IServiceCollection services,
+            TImplementation implementation
+        )
+            where TService1 : class
+            where TService2 : class
+            where TService3 : class
+            where TImplementation : class, TService1, TService2, TService3 =>
+            services
+                .RegisterAsSingleton(implementation)
+                .RegisterAsSingleton<TService1>(implementation)
+                .RegisterAsSingleton<TService2>(implementation)
+                .RegisterAsSingleton<TService3>(implementation);
+        
+        public static IServiceCollection RegisterAsSingleton<TService1, TService2, TService3, TService4, TImplementation>(
+            this IServiceCollection services,
+            TImplementation implementation
+        )
+            where TService1 : class
+            where TService2 : class
+            where TService3 : class
+            where TService4 : class
+            where TImplementation : class, TService1, TService2, TService3, TService4 =>
+            services
+                .RegisterAsSingleton(implementation)
+                .RegisterAsSingleton<TService1>(implementation)
+                .RegisterAsSingleton<TService2>(implementation)
+                .RegisterAsSingleton<TService3>(implementation)
+                .RegisterAsSingleton<TService4>(implementation);
+        
+        public static IServiceCollection RegisterAsSingleton<TService1, TService2, TService3, TService4, TService5, TImplementation>(
+            this IServiceCollection services,
+            TImplementation implementation
+        )
+            where TService1 : class
+            where TService2 : class
+            where TService3 : class
+            where TService4 : class
+            where TService5 : class
+            where TImplementation : class, TService1, TService2, TService3, TService4, TService5 =>
+            services
+                .RegisterAsSingleton(implementation)
+                .RegisterAsSingleton<TService1>(implementation)
+                .RegisterAsSingleton<TService2>(implementation)
+                .RegisterAsSingleton<TService3>(implementation)
+                .RegisterAsSingleton<TService4>(implementation)
+                .RegisterAsSingleton<TService5>(implementation);
     }
 }
