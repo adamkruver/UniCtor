@@ -26,6 +26,9 @@ namespace UniCtor.Strategy
             if (TryGetImplementation(serviceType, out object implementation))
                 return implementation;
             
+            if (TryResolveWithFactory(serviceType, serviceProvider, out implementation))
+                return implementation;
+            
             implementation = _classResolveStrategy.Resolve(serviceType, serviceProvider, resolvingTypes);
             _container.RegisterAsScoped(serviceType, implementation);
             
@@ -42,6 +45,21 @@ namespace UniCtor.Strategy
             implementation = _container.GetImplementationFromParent(serviceType);
 
             return implementation != null;
+        }
+        
+        
+        private bool TryResolveWithFactory(Type serviceType, ServiceProvider serviceProvider, out object implementation)
+        {
+            implementation = default;
+            var factory = _container.GetFactory(serviceType);
+
+            if (factory == null)
+                return false;
+
+            implementation = factory.Invoke(serviceProvider);
+            _container.RegisterAsScoped(serviceType, implementation);
+            
+            return true;
         }
     }
 }

@@ -25,11 +25,28 @@ namespace UniCtor.Strategy
         {
             if(_container.GetImplementation(serviceType) != null)
                 return _container.GetImplementation(serviceType);
+
+            if (TryResolveWithFactory(serviceType, serviceProvider, out object implementation))
+                return implementation;
             
-            object implementation = _classResolveStrategy.Resolve(serviceType, serviceProvider, resolvingTypes);
+            implementation = _classResolveStrategy.Resolve(serviceType, serviceProvider, resolvingTypes);
             _container.RegisterAsSingleton(serviceType, implementation);
             
             return implementation;
+        }
+
+        private bool TryResolveWithFactory(Type serviceType, ServiceProvider serviceProvider, out object implementation)
+        {
+            implementation = default;
+            var factory = _container.GetFactory(serviceType);
+
+            if (factory == null)
+                return false;
+
+            implementation = factory.Invoke(serviceProvider);
+            _container.RegisterAsSingleton(serviceType, implementation);
+            
+            return true;
         }
     }
 }
